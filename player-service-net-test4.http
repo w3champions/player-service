@@ -1,0 +1,6 @@
+@player_service_net_test4_HostAddress = http://localhost:5178
+
+GET {{player_service_net_test4_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
