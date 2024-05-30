@@ -10,6 +10,10 @@
           "args": [],
           "cwd": "${workspaceFolder}",
           "stopAtEntry": false,
+          "serverReadyAction": {
+              "action": "openExternally",
+              "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+          },
           "env": {
               "ASPNETCORE_ENVIRONMENT": "Development",
               "MONGO_CONNECTION_STRING": "mongodb://localhost:27025"
