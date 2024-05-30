@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using player_service_net_test4.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,5 +21,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Add SignalR PlayerHub
+app.MapHub<PlayerHub>("/chatHub");
 
 app.Run();
