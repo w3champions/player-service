@@ -21,6 +21,6 @@ var app = builder.Build();
 app.MapControllers();
 
 // Add SignalR PlayerHub
-app.MapHub<PlayerHub>("/chatHub");
+app.MapHub<PlayerHub>("/playerHub");
 
 app.Run();
