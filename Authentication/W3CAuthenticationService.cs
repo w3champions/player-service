@@ -1,9 +1,9 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using Microsoft.IdentityModel.Tokens;
 
 namespace player_service_net_test4.Authentication;
 public class W3CAuthenticationService : IW3CAuthenticationService
