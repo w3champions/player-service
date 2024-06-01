@@ -42,4 +42,15 @@ public class PlayerHub : Hub
     {
         await Clients.All.SendAsync("ReceiveMessage", user, message);
     }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var user = _connections.GetUser(Context.ConnectionId);
+        if (user != null)
+        {
+            _connections.Remove(Context.ConnectionId);
+        }
+
+        await base.OnDisconnectedAsync(exception);
+    }
 }
