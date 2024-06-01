@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using player_service_net_test4.Hubs;
 using player_service_net_test4.Authentication;
 using player_service_net_test4.Services;
+using player_service_net_test4.Friends;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 builder.Services.AddTransient<IW3CAuthenticationService, W3CAuthenticationService>();
 builder.Services.AddTransient<IWebsiteBackendRepository, WebsiteBackendRepository>();
 builder.Services.AddSingleton<ConnectionMapping>();
+builder.Services.AddTransient<FriendRepository>();
 
 // Add SignalR for using websockets
 builder.Services.AddSignalR();
