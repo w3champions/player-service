@@ -10,13 +10,12 @@
           "args": [],
           "cwd": "${workspaceFolder}",
           "stopAtEntry": false,
-          "serverReadyAction": {
-              "action": "openExternally",
-              "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-          },
           "env": {
               "ASPNETCORE_ENVIRONMENT": "Development",
-              "MONGO_CONNECTION_STRING": "mongodb://localhost:27025"
+              "MONGO_CONNECTION_STRING": "mongodb://192.168.1.171:27020",
+              "ASPNETCORE_URLS": "http://192.168.1.122:5004",
+              "JWT_PUBLIC_KEY": "",
+              "STATISTIC_SERVICE_URI": "http://192.168.1.122:5000"
           }
       }
   ]
