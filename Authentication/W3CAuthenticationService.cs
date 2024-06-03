@@ -1,12 +1,10 @@
-using System;
-using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace player_service_net_test4.Authentication;
-public class W3CAuthenticationService : IW3CAuthenticationService
+public class W3CAuthenticationService
 {
     private static readonly string JwtPublicKey = Regex.Unescape(Environment.GetEnvironmentVariable("JWT_PUBLIC_KEY") ?? "");
 
@@ -14,11 +12,6 @@ public class W3CAuthenticationService : IW3CAuthenticationService
     {
         return W3CUserAuthentication.FromJWT(jwt, JwtPublicKey);
     }
-}
-
-public interface IW3CAuthenticationService
-{
-    W3CUserAuthentication GetUserByToken(string jwt);
 }
 
 public class W3CUserAuthentication

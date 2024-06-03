@@ -14,9 +14,9 @@ string mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_CONNECT
 MongoClient mongoClient = new MongoClient(mongoConnectionString);
 builder.Services.AddSingleton(mongoClient);
 
-builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
-builder.Services.AddTransient<IW3CAuthenticationService, W3CAuthenticationService>();
-builder.Services.AddTransient<IWebsiteBackendRepository, WebsiteBackendRepository>();
+builder.Services.AddTransient<AuthenticationService, AuthenticationService>();
+builder.Services.AddTransient<W3CAuthenticationService, W3CAuthenticationService>();
+builder.Services.AddTransient<WebsiteBackendService, WebsiteBackendService>();
 builder.Services.AddSingleton<ConnectionMapping>();
 builder.Services.AddTransient<FriendRepository>();
 

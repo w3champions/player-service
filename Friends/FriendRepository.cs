@@ -47,13 +47,13 @@ public class FriendRepository : MongoDbRepositoryBase, IFriendRepository
         return true;
     }
 
-    public async Task<List<FriendRequest>> LoadFriendRequestsSentByPlayer(string sender)
+    public async Task<List<FriendRequest>> LoadSentFriendRequests(string sender)
     {
         var requests = await LoadAll<FriendRequest>(r => r.Sender == sender);
         return requests;
     }
 
-    public async Task<List<FriendRequest>> LoadFriendRequestsSentToPlayer(string receiver)
+    public async Task<List<FriendRequest>> LoadReceivedFriendRequests(string receiver)
     {
         var requests = await LoadAll<FriendRequest>(r => r.Receiver == receiver);
         return requests;

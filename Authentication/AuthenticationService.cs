@@ -1,29 +1,17 @@
-using System;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using player_service_net_test4.Models;
 using player_service_net_test4.Services;
 
 namespace player_service_net_test4.Authentication;
-public interface IAuthenticationService
-{
-    Task<User?> GetUser(string? token);
-}
 
-public class AuthenticationService : MongoDbRepositoryBase, IAuthenticationService
+public class AuthenticationService(
+    MongoClient mongoClient,
+    W3CAuthenticationService authenticationService,
+    WebsiteBackendService websiteBackendService
+        ) : MongoDbRepositoryBase(mongoClient)
 {
-    private readonly IW3CAuthenticationService _authenticationService;
-    private readonly IWebsiteBackendRepository _websiteBackendRepository;
-
-    public AuthenticationService(
-        MongoClient mongoClient,
-        IW3CAuthenticationService authenticationService,
-        IWebsiteBackendRepository websiteBackendRepository
-        ) : base(mongoClient)
-    {
-        _authenticationService = authenticationService;
-        _websiteBackendRepository = websiteBackendRepository;
-    }
+    private readonly W3CAuthenticationService _authenticationService = authenticationService;
+    private readonly WebsiteBackendService _websiteBackendService = websiteBackendService;
 
     public async Task<User?> GetUser(string? token)
     {
@@ -31,7 +19,7 @@ public class AuthenticationService : MongoDbRepositoryBase, IAuthenticationServi
         {
             var w3cUserAuthentication = _authenticationService.GetUserByToken(token);
             if (w3cUserAuthentication == null) return null;
-            var user = await _websiteBackendRepository.GetUser(w3cUserAuthentication.BattleTag);
+            var user = await _websiteBackendService.GetUser(w3cUserAuthentication.BattleTag);
             if (user == null) return null;
             return new User(user.BattleTag, user.ProfilePicture);
         }

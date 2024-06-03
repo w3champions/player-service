@@ -8,6 +8,6 @@ public interface IFriendRepository
     Task<FriendRequest> LoadFriendRequest(string sender, string receiver);
     Task<bool> FriendRequestExists(FriendRequest request);
     Task DeleteFriendRequest(FriendRequest request);
-    Task<List<FriendRequest>> LoadFriendRequestsSentByPlayer(string sender);
-    Task<List<FriendRequest>> LoadFriendRequestsSentToPlayer(string receiver);
+    Task<List<FriendRequest>> LoadSentFriendRequests(string sender);
+    Task<List<FriendRequest>> LoadReceivedFriendRequests(string receiver);
 }

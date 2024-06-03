@@ -3,13 +3,7 @@ using Newtonsoft.Json;
 
 namespace player_service_net_test4.Services
 {
-    public interface IWebsiteBackendRepository
-    {
-        Task<User?> GetUser(string battleTag);
-        Task<List<User>?> GetUsers(List<string> battleTags);
-    }
-
-    public class WebsiteBackendRepository : IWebsiteBackendRepository
+    public class WebsiteBackendService
     {
         private static readonly string StatisticServiceApiUrl = Environment.GetEnvironmentVariable("STATISTIC_SERVICE_URI") ?? "";
 

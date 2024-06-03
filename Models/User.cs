@@ -1,5 +1,4 @@
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver.Core.Connections;
 
 namespace player_service_net_test4.Models;
 public class User(string battleTag, ProfilePicture profilePicture)
