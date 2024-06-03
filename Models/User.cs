@@ -1,6 +1,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace player_service_net_test4.Models;
+
 public class User(string battleTag, ProfilePicture profilePicture)
 {
     [BsonId]
