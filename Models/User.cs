@@ -1,19 +1,12 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace player_service_net_test4.Models;
-public class User
+public class User(string battleTag, ProfilePicture profilePicture)
 {
-    public User(string battleTag, ProfilePicture profilePicture)
-    {
-        BattleTag = battleTag;
-        ProfilePicture = profilePicture;
-        Name = battleTag.Split("#")[0];
-    }
-
     [BsonId]
-    public string BattleTag { get; set; }
-    public string Name { get; set; }
-    public ProfilePicture ProfilePicture { get; set; }
+    public string BattleTag { get; set; } = battleTag;
+    public string Name { get; set; } = battleTag.Split("#")[0];
+    public ProfilePicture ProfilePicture { get; set; } = profilePicture;
 }
 
 public class ProfilePicture

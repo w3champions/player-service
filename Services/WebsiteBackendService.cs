@@ -5,24 +5,27 @@ namespace player_service_net_test4.Services
 {
     public interface IWebsiteBackendRepository
     {
-        Task<PlayerProfile?> GetPlayerProfile(string battleTag);
+        Task<User?> GetUser(string battleTag);
     }
 
     public class WebsiteBackendRepository : IWebsiteBackendRepository
     {
         private static readonly string StatisticServiceApiUrl = Environment.GetEnvironmentVariable("STATISTIC_SERVICE_URI") ?? "";
 
-        public async Task<PlayerProfile?> GetPlayerProfile(string battleTag)
+        public async Task<User?> GetUser(string battleTag)
         {
             try
             {
                 var httpClient = new HttpClient();
                 httpClient.BaseAddress = new Uri(StatisticServiceApiUrl);
                 var escapeDataString = Uri.EscapeDataString(battleTag);
-                var result = await httpClient.GetAsync($"/api/players/{escapeDataString}/clan-and-picture");
+                var result = await httpClient.GetAsync($"/api/players/{escapeDataString}/user-brief");
+                if (!result.IsSuccessStatusCode) {
+                    return null;
+                }
                 var content = await result.Content.ReadAsStringAsync();
-                var userDetails = JsonConvert.DeserializeObject<PlayerProfile>(content);
-                return userDetails;
+                var user = JsonConvert.DeserializeObject<User>(content);
+                return user;
             }
             catch (Exception ex)
             {
@@ -30,11 +33,5 @@ namespace player_service_net_test4.Services
                 return null;
             }
         }
-    }
-
-    public class PlayerProfile
-    {
-        public string? ClanId { get; set; }
-        public required ProfilePicture ProfilePicture { get; set;}
     }
 }

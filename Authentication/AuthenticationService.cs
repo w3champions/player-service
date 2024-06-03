@@ -29,11 +29,11 @@ public class AuthenticationService : MongoDbRepositoryBase, IAuthenticationServi
     {
         try
         {
-            var user = _authenticationService.GetUserByToken(token);
+            var w3cUserAuthentication = _authenticationService.GetUserByToken(token);
+            if (w3cUserAuthentication == null) return null;
+            var user = await _websiteBackendRepository.GetUser(w3cUserAuthentication.BattleTag);
             if (user == null) return null;
-            var userDetails = await _websiteBackendRepository.GetPlayerProfile(user.BattleTag);
-            if (userDetails == null) return null;
-            return new User(user.BattleTag, userDetails.ProfilePicture);
+            return new User(user.BattleTag, user.ProfilePicture);
         }
         catch (Exception)
         {
