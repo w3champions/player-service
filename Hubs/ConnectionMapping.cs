@@ -4,9 +4,9 @@ namespace player_service_net_test4.Hubs;
 
 public class ConnectionMapping
 {
-    private readonly Dictionary<string, User> _connections = new Dictionary<string, User>();
+    private readonly Dictionary<string, WebSocketUser> _connections = new Dictionary<string, WebSocketUser>();
 
-    public List<User> GetUsers()
+    public List<WebSocketUser> GetUsers()
     {
         lock (_connections)
         {
@@ -14,7 +14,7 @@ public class ConnectionMapping
         }
     }
 
-    public void Add(string connectionId, User user)
+    public void Add(string connectionId, WebSocketUser user)
     {
         lock (_connections)
         {
@@ -25,11 +25,11 @@ public class ConnectionMapping
         }
     }
 
-    public User? GetUser(string connectionId)
+    public WebSocketUser? GetUser(string connectionId)
     {
         lock (_connections)
         {
-            _connections.TryGetValue(connectionId, out User? user);
+            _connections.TryGetValue(connectionId, out WebSocketUser? user);
             return user;
         }
     }

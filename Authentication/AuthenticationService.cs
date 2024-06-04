@@ -13,7 +13,7 @@ public class AuthenticationService(
     private readonly W3CAuthenticationService _authenticationService = authenticationService;
     private readonly WebsiteBackendService _websiteBackendService = websiteBackendService;
 
-    public async Task<User?> GetUser(string? token)
+    public async Task<WebSocketUser?> GetUser(string? token)
     {
         try
         {
@@ -21,7 +21,7 @@ public class AuthenticationService(
             if (w3cUserAuthentication == null) return null;
             var user = await _websiteBackendService.GetUser(w3cUserAuthentication.BattleTag);
             if (user == null) return null;
-            return new User(user.BattleTag, user.ProfilePicture);
+            return new WebSocketUser(user.BattleTag);
         }
         catch (Exception)
         {

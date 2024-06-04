@@ -8,7 +8,6 @@ public class User(string battleTag, ProfilePicture profilePicture)
     public string BattleTag { get; set; } = battleTag;
     public string Name { get; set; } = battleTag.Split("#")[0];
     public ProfilePicture ProfilePicture { get; set; } = profilePicture;
-    public string? ConnectionId {get; set; }
 }
 
 public class ProfilePicture

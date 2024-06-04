@@ -25,7 +25,7 @@ public class PlayerHub(
     public override async Task OnConnectedAsync()
     {
         var accessToken = _contextAccessor?.HttpContext?.Request.Query["access_token"];
-        var user = await _authenticationService.GetUser(accessToken);
+        WebSocketUser? user = await _authenticationService.GetUser(accessToken);
         if (user == null)
         {
             await Clients.Caller.SendAsync("AuthorizationFailed");
@@ -37,7 +37,7 @@ public class PlayerHub(
         await base.OnConnectedAsync();
     }
 
-    internal async Task LoginAsAuthenticated(User user)
+    internal async Task LoginAsAuthenticated(WebSocketUser user)
     {
         _connections.Add(Context.ConnectionId, user);
         await LoadAll(user.BattleTag);
