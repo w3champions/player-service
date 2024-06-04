@@ -12,15 +12,15 @@ public class PlayerHub(
     ConnectionMapping connections,
     IHttpContextAccessor contextAccessor,
     FriendRepository friendRepository,
-    WebsiteBackendService websiteBackendService) : Hub
+    WebsiteBackendService websiteBackendService,
+    FriendRequestCache friendRequestCache) : Hub
 {
     private readonly AuthenticationService _authenticationService = authenticationService;
     private readonly ConnectionMapping _connections = connections;
     private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
     private readonly FriendRepository _friendRepository = friendRepository;
     private readonly WebsiteBackendService _websiteBackendService = websiteBackendService;
-    // requestsBySender = Map<battletag, friendrequest[]> and requestsByReceiver = Map<battletag, friendrequest[]>
-    // or friendRequests = friendrequest[] and I filter either here or on the frontend.
+    private readonly FriendRequestCache _friendRequestCache = friendRequestCache;
 
     public override async Task OnConnectedAsync()
     {
@@ -43,16 +43,11 @@ public class PlayerHub(
         await LoadAll(user.BattleTag);
     }
 
-    public async Task SendMessage(string user, string message)
-    {
-        await Clients.All.SendAsync("ReceiveMessage", user, message);
-    }
-
     public async Task LoadAll(string battleTag)
     {
         FriendList friendList = await _friendRepository.LoadFriendList(battleTag);
-        List<FriendRequest> sentRequests = await _friendRepository.LoadSentFriendRequests(battleTag);
-        List<FriendRequest> receivedRequests = await _friendRepository.LoadReceivedFriendRequests(battleTag);
+        List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(battleTag);
+        List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(battleTag);
         await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests);
     }
 
@@ -75,7 +70,7 @@ public class PlayerHub(
             if (currentUser.Equals(receiver, StringComparison.CurrentCultureIgnoreCase)) {
                 throw new ValidationException("Cannot request yourself as a friend.");
             }
-            var sentRequests = await _friendRepository.LoadSentFriendRequests(currentUser);
+            var sentRequests = await _friendRequestCache.LoadSentFriendRequests(currentUser);
             if (sentRequests.Count > 10) {
                 throw new ValidationException("You have too many pending friend requests.");
             }
@@ -83,10 +78,11 @@ public class PlayerHub(
             var receiverFriendlist = await _friendRepository.LoadFriendList(receiver);
             await CanMakeFriendRequest(receiverFriendlist, request);
             await _friendRepository.CreateFriendRequest(request);
+            _friendRequestCache.Insert(request);
             sentRequests.Add(request);
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request sent to {receiver}!");
 
-            var requestsReceivedByOtherPlayer = await _friendRepository.LoadReceivedFriendRequests(receiver);
+            var requestsReceivedByOtherPlayer = await _friendRequestCache.LoadReceivedFriendRequests(receiver);
             PushDataToOtherPlayer(receiver, null, null, requestsReceivedByOtherPlayer);
         } catch (Exception ex) {
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
@@ -98,13 +94,14 @@ public class PlayerHub(
         var currentUser = _connections.GetUser(Context.ConnectionId)?.BattleTag;
         if (currentUser == null) return;
         try {
-            var request = await _friendRepository.LoadFriendRequest(currentUser, receiver) ?? throw new ValidationException("Could not find a friend request to delete.");
+            var request = await _friendRequestCache.LoadFriendRequest(currentUser, receiver) ?? throw new ValidationException("Could not find a friend request to delete.");
             await _friendRepository.DeleteFriendRequest(request);
+            _friendRequestCache.Delete(request);
 
-            List<FriendRequest> sentRequests = await _friendRepository.LoadSentFriendRequests(currentUser);
+            List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(currentUser);
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request to {receiver} deleted!");
 
-            var requestsReceivedByOtherPlayer = await _friendRepository.LoadReceivedFriendRequests(receiver);
+            var requestsReceivedByOtherPlayer = await _friendRequestCache.LoadReceivedFriendRequests(receiver);
             PushDataToOtherPlayer(receiver, null, null, requestsReceivedByOtherPlayer);
         } catch (Exception ex) {
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
@@ -119,11 +116,13 @@ public class PlayerHub(
             var currentUserFriendlist = await _friendRepository.LoadFriendList(currentUser);
             var senderFriendlist = await _friendRepository.LoadFriendList(sender);
 
-            var request = await _friendRepository.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to accept.");
+            var request = await _friendRequestCache.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to accept.");
             await _friendRepository.DeleteFriendRequest(request);
-            var reciprocalRequest = await _friendRepository.LoadFriendRequest(currentUser, sender);
+            _friendRequestCache.Delete(request);
+            var reciprocalRequest = await _friendRequestCache.LoadFriendRequest(currentUser, sender);
             if (reciprocalRequest != null) {
                 await _friendRepository.DeleteFriendRequest(reciprocalRequest);
+                _friendRequestCache.Delete(reciprocalRequest);
             }
 
             if (!currentUserFriendlist.Friends.Contains(sender)) {
@@ -136,11 +135,11 @@ public class PlayerHub(
             }
             await _friendRepository.UpsertFriendList(senderFriendlist);
 
-            List<FriendRequest> sentRequests = await _friendRepository.LoadSentFriendRequests(currentUser);
-            List<FriendRequest> receivedRequests = await _friendRepository.LoadReceivedFriendRequests(currentUser);
+            List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(currentUser);
+            List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(currentUser);
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), currentUserFriendlist, sentRequests, receivedRequests, $"Friend request from {sender} accepted!");
 
-            var requestsSentByOtherPlayer = await _friendRepository.LoadSentFriendRequests(sender);
+            var requestsSentByOtherPlayer = await _friendRequestCache.LoadSentFriendRequests(sender);
             PushDataToOtherPlayer(sender, senderFriendlist, requestsSentByOtherPlayer);
         } catch (Exception ex) {
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
@@ -152,13 +151,14 @@ public class PlayerHub(
         var currentUser = _connections.GetUser(Context.ConnectionId)?.BattleTag;
         if (currentUser == null) return;
         try {
-            var request = await _friendRepository.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to deny.");
+            var request = await _friendRequestCache.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to deny.");
             await _friendRepository.DeleteFriendRequest(request);
+            _friendRequestCache.Delete(request);
 
-            List<FriendRequest> receivedRequests = await _friendRepository.LoadReceivedFriendRequests(currentUser);
+            List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(currentUser);
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, null, receivedRequests, $"Friend request from {sender} denied!");
 
-            var sentRequests = await _friendRepository.LoadSentFriendRequests(sender);
+            var sentRequests = await _friendRequestCache.LoadSentFriendRequests(sender);
             PushDataToOtherPlayer(sender, null, sentRequests);
         } catch (Exception ex) {
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
@@ -173,16 +173,17 @@ public class PlayerHub(
             var currentUserFriendlist = await _friendRepository.LoadFriendList(currentUser);
             CanBlock(currentUserFriendlist, sender);
 
-            var request = await _friendRepository.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to block.");
+            var request = await _friendRequestCache.LoadFriendRequest(sender, currentUser) ?? throw new ValidationException("Could not find a friend request to block.");
             await _friendRepository.DeleteFriendRequest(request);
+            _friendRequestCache.Delete(request);
 
             currentUserFriendlist.BlockedBattleTags.Add(sender);
             await _friendRepository.UpsertFriendList(currentUserFriendlist);
 
-            List<FriendRequest> receivedRequests = await _friendRepository.LoadReceivedFriendRequests(currentUser);
+            List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(currentUser);
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), currentUserFriendlist, null, receivedRequests, $"Friend requests from {sender} blocked!");
 
-            var sentRequests = await _friendRepository.LoadSentFriendRequests(sender);
+            var sentRequests = await _friendRequestCache.LoadSentFriendRequests(sender);
             PushDataToOtherPlayer(sender, null, sentRequests);
         } catch (Exception ex) {
             await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
@@ -263,7 +264,7 @@ public class PlayerHub(
         if (friendList.Friends.Contains(req.Sender)) {
             throw new ValidationException("You are already friends with this player.");
         }
-        var requestAlreadyExists = await _friendRepository.FriendRequestExists(req);
+        var requestAlreadyExists = await _friendRequestCache.FriendRequestExists(req);
         if (requestAlreadyExists) {
             throw new ValidationException("You have already requested to be friends with this player.");
         }

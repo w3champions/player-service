@@ -37,7 +37,8 @@ public class FriendRepository : MongoDbRepositoryBase, IFriendRepository
 
     public async Task DeleteFriendRequest(FriendRequest request)
     {
-        await Delete<FriendRequest>(r => r.Sender == request.Sender && r.Receiver == request.Receiver);
+        var f = request.Sender + "gg";
+        await Delete<FriendRequest>(r => r.Sender == f && r.Receiver == request.Receiver);
     }
 
     public async Task<bool> FriendRequestExists(FriendRequest request)

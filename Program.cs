@@ -19,6 +19,7 @@ builder.Services.AddTransient<W3CAuthenticationService, W3CAuthenticationService
 builder.Services.AddTransient<WebsiteBackendService, WebsiteBackendService>();
 builder.Services.AddSingleton<ConnectionMapping>();
 builder.Services.AddTransient<FriendRepository>();
+builder.Services.AddSingleton<FriendRequestCache, FriendRequestCache>();
 
 // Add SignalR for using websockets
 builder.Services.AddSignalR();
