@@ -1,6 +1,6 @@
-https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new-sdk-templates#webapi
+# W3Champions Player Service
+The W3Champions player service currently handles the W3Champions friend list.
 
-```shell
-dotnet new webapi --no-openapi -controllers --name player-service-net-test4
-```
-
+## Prerequisites for development
+.NET 8 SDK
+A local MongoDB instance
