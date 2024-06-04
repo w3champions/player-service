@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.SignalR;
 using MongoDB.Driver;
-using player_service_net_test4.Hubs;
-using player_service_net_test4.Authentication;
-using player_service_net_test4.Services;
-using player_service_net_test4.Friends;
+using player_service.Hubs;
+using player_service.Authentication;
+using player_service.Services;
+using player_service.Friends;
 
 var builder = WebApplication.CreateBuilder(args);
 

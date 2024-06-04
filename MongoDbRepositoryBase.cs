@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using MongoDB.Driver;
 
-namespace player_service_net_test4;
+namespace player_service;
 public class MongoDbRepositoryBase
 {
     private readonly MongoClient _mongoClient;

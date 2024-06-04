@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.SignalR;
-using player_service_net_test4.Authentication;
-using player_service_net_test4.Friends;
-using player_service_net_test4.Models;
-using player_service_net_test4.Services;
+using player_service.Authentication;
+using player_service.Friends;
+using player_service.Models;
+using player_service.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace player_service_net_test4.Hubs;
+namespace player_service.Hubs;
 
 public class PlayerHub(
     AuthenticationService authenticationService,

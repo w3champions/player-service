@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 
-namespace player_service_net_test4.Friends;
+namespace player_service.Friends;
 
 public class FriendRequestCache(MongoClient mongoClient) : MongoDbRepositoryBase(mongoClient)
 {
