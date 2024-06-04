@@ -8,7 +8,7 @@ public class W3CAuthenticationService
 {
     private static readonly string JwtPublicKey = Regex.Unescape(Environment.GetEnvironmentVariable("JWT_PUBLIC_KEY") ?? "");
 
-    public W3CUserAuthentication GetUserByToken(string jwt)
+    public W3CUserAuthentication? GetUserByToken(string? jwt)
     {
         return W3CUserAuthentication.FromJWT(jwt, JwtPublicKey);
     }
@@ -16,7 +16,7 @@ public class W3CAuthenticationService
 
 public class W3CUserAuthentication
 {
-    public static W3CUserAuthentication FromJWT(string jwt, string publicKey)
+    public static W3CUserAuthentication? FromJWT(string? jwt, string publicKey)
     {
         try
         {
@@ -37,14 +37,10 @@ public class W3CUserAuthentication
             var handler = new JwtSecurityTokenHandler();
             var claims = handler.ValidateToken(jwt, validationParameters, out _);
             var btag = claims.Claims.First(c => c.Type == "battleTag").Value;
-            var isAdmin = bool.Parse(claims.Claims.First(c => c.Type == "isAdmin").Value);
-            var name = claims.Claims.First(c => c.Type == "name").Value;
 
             return new W3CUserAuthentication
             {
-                Name = name,
                 BattleTag = btag,
-                IsAdmin = isAdmin
             };
         }
         catch (Exception)
@@ -53,7 +49,5 @@ public class W3CUserAuthentication
         }
     }
 
-    public string BattleTag { get; set; }
-    public string Name { get; set; }
-    public bool IsAdmin { get; set; }
+    public required string BattleTag { get; set; }
 }

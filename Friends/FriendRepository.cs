@@ -2,10 +2,8 @@ using MongoDB.Driver;
 
 namespace player_service_net_test4.Friends;
 
-public class FriendRepository : MongoDbRepositoryBase, IFriendRepository
+public class FriendRepository(MongoClient mongoClient) : MongoDbRepositoryBase(mongoClient), IFriendRepository
 {
-    public FriendRepository(MongoClient mongoClient) : base(mongoClient) {}
-
     public async Task<FriendList> LoadFriendList(string battleTag)
     {
         var friendList = await LoadFirst<FriendList>(battleTag);
@@ -24,27 +22,26 @@ public class FriendRepository : MongoDbRepositoryBase, IFriendRepository
         return Upsert(friendList, p => p.Id == friendList.Id);
     }
 
-    public async Task<FriendRequest> CreateFriendRequest(FriendRequest request)
+    public async Task<FriendRequest> CreateFriendRequest(FriendRequest req)
     {
-        await Insert(request);
-        return request;
+        await Insert(req);
+        return req;
     }
 
-    public async Task<FriendRequest> LoadFriendRequest(string sender, string receiver)
+    public async Task<FriendRequest> LoadFriendRequest(FriendRequest req)
     {
-        return await LoadFirst<FriendRequest>(r => r.Sender == sender && r.Receiver == receiver);
+        return await LoadFirst<FriendRequest>(r => r.Sender == req.Sender && r.Receiver == req.Receiver);
     }
 
-    public async Task DeleteFriendRequest(FriendRequest request)
+    public async Task DeleteFriendRequest(FriendRequest req)
     {
-        var f = request.Sender + "gg";
-        await Delete<FriendRequest>(r => r.Sender == f && r.Receiver == request.Receiver);
+        await Delete<FriendRequest>(r => r.Sender == req.Sender && r.Receiver == req.Receiver);
     }
 
-    public async Task<bool> FriendRequestExists(FriendRequest request)
+    public async Task<bool> FriendRequestExists(FriendRequest req)
     {
-        var req = await LoadFirst<FriendRequest>(r => r.Sender == request.Sender && r.Receiver == request.Receiver);
-        if (req == null) return false;
+        var request = await LoadFirst<FriendRequest>(r => r.Sender == req.Sender && r.Receiver == req.Receiver);
+        if (request == null) return false;
         return true;
     }
 
