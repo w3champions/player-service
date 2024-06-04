@@ -1,7 +1,7 @@
-using player_service_net_test4.Models;
+using player_service.Models;
 using Newtonsoft.Json;
 
-namespace player_service_net_test4.Services
+namespace player_service.Services
 {
     public class WebsiteBackendService
     {

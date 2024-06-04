@@ -1,6 +1,6 @@
-using player_service_net_test4.Models;
+using player_service.Models;
 
-namespace player_service_net_test4.Hubs;
+namespace player_service.Hubs;
 
 public class ConnectionMapping
 {

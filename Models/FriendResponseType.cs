@@ -1,4 +1,4 @@
-namespace player_service_net_test4.Models;
+namespace player_service.Models;
 
 public class FriendResponseType
 {

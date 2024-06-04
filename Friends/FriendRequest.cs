@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 
-namespace player_service_net_test4.Friends;
+namespace player_service.Friends;
 
 public class FriendRequest(string sender, string receiver)
 {

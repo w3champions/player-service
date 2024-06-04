@@ -1,8 +1,8 @@
 using MongoDB.Driver;
-using player_service_net_test4.Models;
-using player_service_net_test4.Services;
+using player_service.Models;
+using player_service.Services;
 
-namespace player_service_net_test4.Authentication;
+namespace player_service.Authentication;
 
 public class AuthenticationService(
     MongoClient mongoClient,

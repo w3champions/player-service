@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
-namespace player_service_net_test4.Authentication;
+namespace player_service.Authentication;
 public class W3CAuthenticationService
 {
     private static readonly string JwtPublicKey = Regex.Unescape(Environment.GetEnvironmentVariable("JWT_PUBLIC_KEY") ?? "");
