@@ -48,7 +48,7 @@ public class PlayerHub(
         FriendList friendList = await _friendRepository.LoadFriendList(battleTag);
         List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(battleTag);
         List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(battleTag);
-        await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests);
+        await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests);
     }
 
     public async Task LoadFriends()
@@ -57,7 +57,7 @@ public class PlayerHub(
         if (currentUser == null) return;
         FriendList friendList = await _friendRepository.LoadFriendList(currentUser);
         var users = await _websiteBackendService.GetUsers(friendList.Friends);
-        await Clients.Caller.SendAsync(FriendMessageResponse.PushFriends.ToString(), users);
+        await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), users);
     }
 
     public async Task<List<User>> GetFriends(string battleTag)
@@ -83,12 +83,12 @@ public class PlayerHub(
             await _friendRepository.CreateFriendRequest(req);
             _friendRequestCache.Insert(req);
             sentRequests.Add(req);
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request sent to {req.Receiver}!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request sent to {req.Receiver}!");
 
             var requestsReceivedByOtherPlayer = await _friendRequestCache.LoadReceivedFriendRequests(req.Receiver);
             await PushFriendResponseDataToPlayer(req.Receiver, null, null, requestsReceivedByOtherPlayer);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -100,12 +100,12 @@ public class PlayerHub(
             _friendRequestCache.Delete(request);
 
             List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(req.Sender);
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request to {req.Receiver} deleted!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), null, sentRequests, null, $"Friend request to {req.Receiver} deleted!");
 
             var requestsReceivedByOtherPlayer = await _friendRequestCache.LoadReceivedFriendRequests(req.Receiver);
             await PushFriendResponseDataToPlayer(req.Receiver, null, null, requestsReceivedByOtherPlayer);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -136,16 +136,16 @@ public class PlayerHub(
 
             List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(req.Receiver);
             List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(req.Receiver);
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), currentUserFriendlist, sentRequests, receivedRequests, $"Friend request from {req.Sender} accepted!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), currentUserFriendlist, sentRequests, receivedRequests, $"Friend request from {req.Sender} accepted!");
 
             List<User> receiverFriends = await GetFriends(req.Receiver);
-            await Clients.Caller.SendAsync(FriendMessageResponse.PushFriends.ToString(), receiverFriends);
+            await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), receiverFriends);
 
             await PushFriendsToPlayer(req.Sender);
             var requestsSentByOtherPlayer = await _friendRequestCache.LoadSentFriendRequests(req.Sender);
             await PushFriendResponseDataToPlayer(req.Sender, senderFriendlist, requestsSentByOtherPlayer);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -157,12 +157,12 @@ public class PlayerHub(
             _friendRequestCache.Delete(request);
 
             List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(req.Receiver);
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), null, null, receivedRequests, $"Friend request from {req.Sender} denied!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), null, null, receivedRequests, $"Friend request from {req.Sender} denied!");
 
             var sentRequests = await _friendRequestCache.LoadSentFriendRequests(req.Sender);
             await PushFriendResponseDataToPlayer(req.Sender, null, sentRequests);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -180,12 +180,12 @@ public class PlayerHub(
             await _friendRepository.UpsertFriendList(currentUserFriendlist);
 
             List<FriendRequest> receivedRequests = await _friendRequestCache.LoadReceivedFriendRequests(req.Receiver);
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), currentUserFriendlist, null, receivedRequests, $"Friend requests from {req.Sender} blocked!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), currentUserFriendlist, null, receivedRequests, $"Friend requests from {req.Sender} blocked!");
 
             var sentRequests = await _friendRequestCache.LoadSentFriendRequests(req.Sender);
             await PushFriendResponseDataToPlayer(req.Sender, null, sentRequests);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -200,9 +200,9 @@ public class PlayerHub(
             friendList.BlockedBattleTags.Remove(itemToRemove);
             await _friendRepository.UpsertFriendList(friendList);
 
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), friendList, null, null, $"Friend requests from {battleTag} unblocked!");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), friendList, null, null, $"Friend requests from {battleTag} unblocked!");
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -225,16 +225,16 @@ public class PlayerHub(
             }
             await _friendRepository.UpsertFriendList(otherUserFriendlist);
 
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseData.ToString(), currentUserFriendlist, null, null, $"Removed {friend} from friends.");
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), currentUserFriendlist, null, null, $"Removed {friend} from friends.");
 
             List<User> currentUserFriends = await GetFriends(currentUser);
-            await Clients.Caller.SendAsync(FriendMessageResponse.PushFriends.ToString(), currentUserFriends);
+            await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), currentUserFriends);
 
             await PushFriendsToPlayer(friend);
 
             await PushFriendResponseDataToPlayer(friend, otherUserFriendlist);
         } catch (Exception ex) {
-            await Clients.Caller.SendAsync(FriendMessageResponse.FriendResponseMessage.ToString(), ex.Message);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendResponseMessage.ToString(), ex.Message);
         }
     }
 
@@ -258,14 +258,14 @@ public class PlayerHub(
     ) {
         var player = _connections.GetUsers().FirstOrDefault(x => x.BattleTag == battleTag);
         if (player?.ConnectionId == null) return;
-        await Clients.Client(player.ConnectionId).SendAsync(FriendMessageResponse.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests, message);
+        await Clients.Client(player.ConnectionId).SendAsync(FriendResponseType.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests, message);
     }
 
     private async Task PushFriendsToPlayer(string battleTag) {
         var player = _connections.GetUsers().FirstOrDefault(x => x.BattleTag == battleTag);
         if (player?.ConnectionId == null) return;
         List<User> friends = await GetFriends(battleTag);
-        await Clients.Client(player.ConnectionId).SendAsync(FriendMessageResponse.PushFriends.ToString(), friends);
+        await Clients.Client(player.ConnectionId).SendAsync(FriendResponseType.PushFriends.ToString(), friends);
     }
 
     private async Task CanMakeFriendRequest(FriendList friendList, FriendRequest req) {
