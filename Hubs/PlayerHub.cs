@@ -40,10 +40,10 @@ public class PlayerHub(
     internal async Task LoginAsAuthenticated(WebSocketUser user)
     {
         _connections.Add(Context.ConnectionId, user);
-        await LoadAll(user.BattleTag);
+        await LoadFriendListAndRequests(user.BattleTag);
     }
 
-    public async Task LoadAll(string battleTag)
+    private async Task LoadFriendListAndRequests(string battleTag)
     {
         FriendList friendList = await _friendRepository.LoadFriendList(battleTag);
         List<FriendRequest> sentRequests = await _friendRequestCache.LoadSentFriendRequests(battleTag);
@@ -51,19 +51,12 @@ public class PlayerHub(
         await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests);
     }
 
-    public async Task LoadFriends()
+    public async Task LoadFriendsWithPictures()
     {
         var currentUser = _connections.GetUser(Context.ConnectionId)?.BattleTag;
         if (currentUser == null) return;
-        FriendList friendList = await _friendRepository.LoadFriendList(currentUser);
-        var users = await _websiteBackendService.GetUsers(friendList.Friends);
-        await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), users);
-    }
-
-    public async Task<List<User>> GetFriends(string battleTag)
-    {
-        FriendList friendList = await _friendRepository.LoadFriendList(battleTag);
-        return await _websiteBackendService.GetUsers(friendList.Friends) ?? [];
+        List<User> friends = await GetFriends(currentUser);
+        await Clients.Caller.SendAsync(FriendResponseType.FriendsWithPictures.ToString(), friends);
     }
 
     public async Task MakeFriendRequest(FriendRequest req)
@@ -139,9 +132,9 @@ public class PlayerHub(
             await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), currentUserFriendlist, sentRequests, receivedRequests, $"Friend request from {req.Sender} accepted!");
 
             List<User> receiverFriends = await GetFriends(req.Receiver);
-            await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), receiverFriends);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendsWithPictures.ToString(), receiverFriends);
 
-            await PushFriendsToPlayer(req.Sender);
+            await PushFriendsWithPicturesToPlayer(req.Sender);
             var requestsSentByOtherPlayer = await _friendRequestCache.LoadSentFriendRequests(req.Sender);
             await PushFriendResponseDataToPlayer(req.Sender, senderFriendlist, requestsSentByOtherPlayer);
         } catch (Exception ex) {
@@ -228,9 +221,9 @@ public class PlayerHub(
             await Clients.Caller.SendAsync(FriendResponseType.FriendResponseData.ToString(), currentUserFriendlist, null, null, $"Removed {friend} from friends.");
 
             List<User> currentUserFriends = await GetFriends(currentUser);
-            await Clients.Caller.SendAsync(FriendResponseType.PushFriends.ToString(), currentUserFriends);
+            await Clients.Caller.SendAsync(FriendResponseType.FriendsWithPictures.ToString(), currentUserFriends);
 
-            await PushFriendsToPlayer(friend);
+            await PushFriendsWithPicturesToPlayer(friend);
 
             await PushFriendResponseDataToPlayer(friend, otherUserFriendlist);
         } catch (Exception ex) {
@@ -238,15 +231,10 @@ public class PlayerHub(
         }
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
+    private async Task<List<User>> GetFriends(string battleTag)
     {
-        var user = _connections.GetUser(Context.ConnectionId);
-        if (user != null)
-        {
-            _connections.Remove(Context.ConnectionId);
-        }
-
-        await base.OnDisconnectedAsync(exception);
+        FriendList friendList = await _friendRepository.LoadFriendList(battleTag);
+        return await _websiteBackendService.GetUsers(friendList.Friends) ?? [];
     }
 
     private async Task PushFriendResponseDataToPlayer(
@@ -261,11 +249,11 @@ public class PlayerHub(
         await Clients.Client(player.ConnectionId).SendAsync(FriendResponseType.FriendResponseData.ToString(), friendList, sentRequests, receivedRequests, message);
     }
 
-    private async Task PushFriendsToPlayer(string battleTag) {
+    private async Task PushFriendsWithPicturesToPlayer(string battleTag) {
         var player = _connections.GetUsers().FirstOrDefault(x => x.BattleTag == battleTag);
         if (player?.ConnectionId == null) return;
         List<User> friends = await GetFriends(battleTag);
-        await Clients.Client(player.ConnectionId).SendAsync(FriendResponseType.PushFriends.ToString(), friends);
+        await Clients.Client(player.ConnectionId).SendAsync(FriendResponseType.FriendsWithPictures.ToString(), friends);
     }
 
     private async Task CanMakeFriendRequest(FriendList friendList, FriendRequest req) {
@@ -288,5 +276,16 @@ public class PlayerHub(
         if (friendList.Friends.Contains(battleTag)) {
             throw new ValidationException("You cannot block a player you are friends with.");
         }
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var user = _connections.GetUser(Context.ConnectionId);
+        if (user != null)
+        {
+            _connections.Remove(Context.ConnectionId);
+        }
+
+        await base.OnDisconnectedAsync(exception);
     }
 }

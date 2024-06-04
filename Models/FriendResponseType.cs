@@ -8,7 +8,7 @@ public class FriendResponseType
 
     public static FriendResponseType FriendResponseMessage { get { return new FriendResponseType("FriendResponseMessage"); } }
     public static FriendResponseType FriendResponseData { get { return new FriendResponseType("FriendResponseData"); } }
-    public static FriendResponseType PushFriends { get { return new FriendResponseType("PushFriends"); } }
+    public static FriendResponseType FriendsWithPictures { get { return new FriendResponseType("FriendsWithPictures"); } }
 
     public override string ToString()
     {
