@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.SignalR;
-using player_service.Authentication;
-using player_service.Friends;
-using player_service.Models;
-using player_service.Services;
+using W3ChampionsPlayerService.Authentication;
+using W3ChampionsPlayerService.Friends;
+using W3ChampionsPlayerService.Models;
+using W3ChampionsPlayerService.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace player_service.Hubs;
+namespace W3ChampionsPlayerService.Hubs;
 
 public class PlayerHub(
     AuthenticationService authenticationService,

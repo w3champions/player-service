@@ -1,4 +1,4 @@
-namespace player_service.Friends;
+namespace W3ChampionsPlayerService.Friends;
 
 public class FriendList(string battleTag) : IIdentifiable
 {

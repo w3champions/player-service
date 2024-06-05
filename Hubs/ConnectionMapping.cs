@@ -1,6 +1,6 @@
-using player_service.Models;
+using W3ChampionsPlayerService.Models;
 
-namespace player_service.Hubs;
+namespace W3ChampionsPlayerService.Hubs;
 
 public class ConnectionMapping
 {

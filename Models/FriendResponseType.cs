@@ -1,4 +1,4 @@
-namespace player_service.Models;
+namespace W3ChampionsPlayerService.Models;
 
 public class FriendResponseType
 {
