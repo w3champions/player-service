@@ -1,8 +1,8 @@
 using MongoDB.Driver;
-using player_service.Models;
-using player_service.Services;
+using W3ChampionsPlayerService.Models;
+using W3ChampionsPlayerService.Services;
 
-namespace player_service.Authentication;
+namespace W3ChampionsPlayerService.Authentication;
 
 public class AuthenticationService(
     MongoClient mongoClient,

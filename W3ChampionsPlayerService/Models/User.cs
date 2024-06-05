@@ -1,6 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace player_service.Models;
+namespace W3ChampionsPlayerService.Models;
 
 public class User(string battleTag, ProfilePicture profilePicture)
 {

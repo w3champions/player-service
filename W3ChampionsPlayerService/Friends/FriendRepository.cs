@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 
-namespace player_service.Friends;
+namespace W3ChampionsPlayerService.Friends;
 
 public class FriendRepository(MongoClient mongoClient) : MongoDbRepositoryBase(mongoClient), IFriendRepository
 {

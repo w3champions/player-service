@@ -7,7 +7,7 @@
           "type": "process",
           "args": [
               "build",
-              "${workspaceFolder}/player-service.csproj",
+              "${workspaceFolder}/W3ChampionsPlayerService/W3ChampionsPlayerService.csproj",
               "/property:GenerateFullPaths=true",
               "/consoleloggerparameters:NoSummary"
           ],

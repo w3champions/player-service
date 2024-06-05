@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>player_service</RootNamespace>
+    <RootNamespace>W3ChampionsPlayerService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
-using player_service.Models;
+using W3ChampionsPlayerService.Models;
 using Newtonsoft.Json;
 
-namespace player_service.Services
+namespace W3ChampionsPlayerService.Services
 {
     public class WebsiteBackendService
     {

@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 
-namespace player_service.Friends;
+namespace W3ChampionsPlayerService.Friends;
 
 public class FriendRequest(string sender, string receiver)
 {
