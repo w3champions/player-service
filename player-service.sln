@@ -1,25 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.002.0
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "player-service-net-test4", "player-service-net-test4.csproj", "{A81FFB81-05B1-4E48-A356-DC26EF36459E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A81FFB81-05B1-4E48-A356-DC26EF36459E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A81FFB81-05B1-4E48-A356-DC26EF36459E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A81FFB81-05B1-4E48-A356-DC26EF36459E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A81FFB81-05B1-4E48-A356-DC26EF36459E}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {54221F86-D538-4055-929A-6712F952D2D5}
 	EndGlobalSection
 EndGlobal
