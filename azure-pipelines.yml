@@ -1,0 +1,42 @@
+name: $(Build.BuildID)
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+
+- task: DotNetCoreCLI@2
+  displayName: Restore project
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+
+- task: DotNetCoreCLI@2
+  displayName: Build project
+  inputs:
+    command: 'build'
+
+- task: DotNetCoreCLI@2
+  displayName: Run tests
+  inputs:
+    command: 'test'
+
+- task: Docker@2
+  displayName: Build and push a docker image
+  inputs:
+    containerRegistry: 'official-docker-modmoto'
+    repository: 'modmoto/w3champions-player-service'
+    command: 'buildAndPush'
+    Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    buildContext: '.'
+    tags: |
+      $(Build.BuildID)
